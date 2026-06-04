@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { getProjects, getMyTasks, deleteProject } from '../services/api';
 import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
-  BarChart, Bar, XAxis, YAxis, Legend
+  BarChart, Bar, XAxis, YAxis,
 } from 'recharts';
 
 const COLORS = ['#6366f1', '#f59e0b', '#3b82f6', '#10b981'];
