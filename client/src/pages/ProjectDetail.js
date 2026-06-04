@@ -29,33 +29,37 @@ export default function ProjectDetail() {
          m.user?._id?.toString() === user?._id?.toString()
   )?.role;
   const canEdit = isOwner || myMemberRole === 'admin' || myMemberRole === 'editor';
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-   useEffect(() => 
-    {
-      fetchData();
-    }, [id]);
   const fetchData = async () => {
-    try {
-      const [projRes, taskRes] = await Promise.all([
-        getProject(id),
-        getTasksByProject(id)
-      ]);
-      const proj = projRes.data.project;
-      setProject(proj);
-      setTasks(taskRes.data.grouped);
+  try {
+    const [projRes, taskRes] = await Promise.all([
+      getProject(id),
+      getTasksByProject(id)
+    ]);
 
-      // Build members dropdown list
-      const allMembers = [
-        { _id: proj.owner._id, name: proj.owner.name + ' 👑 (Owner)' },
-        ...proj.members.map(m => ({ _id: m.user._id, name: m.user.name + ` (${m.role})` }))
-      ];
-      setMembersList(allMembers);
-    } catch (err) {
-      setError('Failed to load project');
-    } finally {
-      setLoading(false);
-    }
-  };
+    const proj = projRes.data.project;
+    setProject(proj);
+    setTasks(taskRes.data.grouped);
+
+    const allMembers = [
+      { _id: proj.owner._id, name: proj.owner.name + ' 👑 (Owner)' },
+      ...proj.members.map(m => ({
+        _id: m.user._id,
+        name: m.user.name + ` (${m.role})`
+      }))
+    ];
+
+    setMembersList(allMembers);
+  } catch (err) {
+    setError('Failed to load project');
+  } finally {
+    setLoading(false);
+  }
+};
+
+// eslint-disable-next-line react-hooks/exhaustive-deps
+useEffect(() => {
+  fetchData();
+}, [id]);
 
   const showToast = (msg, type = 'success') => {
     if (type === 'success') setSuccess(msg);
