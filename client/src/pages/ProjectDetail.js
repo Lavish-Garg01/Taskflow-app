@@ -29,8 +29,10 @@ export default function ProjectDetail() {
          m.user?._id?.toString() === user?._id?.toString()
   )?.role;
   const canEdit = isOwner || myMemberRole === 'admin' || myMemberRole === 'editor';
-
-  useEffect(() => { fetchData(); }, [id]);
+   useEffect(() => {
+   fetchData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+    } , [id]);
 
   const fetchData = async () => {
     try {
