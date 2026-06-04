@@ -32,8 +32,7 @@ export default function ProjectDetail() {
    useEffect(() => {
    fetchData();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-    } , [id]);
-
+    }, [id]);   
   const fetchData = async () => {
     try {
       const [projRes, taskRes] = await Promise.all([
