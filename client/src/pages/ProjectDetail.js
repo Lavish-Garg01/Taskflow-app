@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { getProject, getTasksByProject, createTask, updateTask, deleteTask } from '../services/api';
+import { getProject, getTasksByProject, createTask, updateTask, deleteTask, getAISuggestion } from '../services/api';
 import API from '../services/api';
 
 export default function ProjectDetail() {
@@ -61,12 +61,39 @@ export default function ProjectDetail() {
     setTimeout(() => { setSuccess(''); setError(''); }, 3000);
   };
 
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiSubtasks, setAiSubtasks] = useState([]);
+
+  const handleAISuggest = async () => {
+    if (!taskForm.title) {
+      showToast('Task title daalo pehle', 'error');
+      return;
+    }
+    setAiLoading(true);
+    try {
+      const res = await getAISuggestion({ title: taskForm.title, description: taskForm.description });
+      const { priority, enhancedDescription, subtasks } = res.data.suggestion;
+      setTaskForm({
+        ...taskForm,
+        priority: priority || taskForm.priority,
+        description: enhancedDescription || taskForm.description,
+      });
+      setAiSubtasks(subtasks || []);
+      showToast('AI suggestion applied ✨');
+    } catch (err) {
+      showToast('AI suggestion failed, try again', 'error');
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   const handleCreateTask = async (e) => {
     e.preventDefault();
     try {
       await createTask({ ...taskForm, projectId: id, status: activeCol });
       setShowTaskForm(false);
       setTaskForm({ title: '', description: '', priority: 'medium', assignedTo: '', dueDate: '' });
+      setAiSubtasks([]);
       fetchData();
       showToast('Task created successfully! ✅');
     } catch (err) {
@@ -386,6 +413,25 @@ export default function ProjectDetail() {
                 <label>Description</label>
                 <textarea placeholder="Add more details..."
                   value={taskForm.description} onChange={e => setTaskForm({ ...taskForm, description: e.target.value })} />
+              </div>
+              <div className="field">
+                <button
+                  type="button"
+                  className="btn btn-outline"
+                  onClick={handleAISuggest}
+                  disabled={aiLoading}
+                  style={{ width: '100%', borderColor: '#8b5cf6', color: '#8b5cf6' }}
+                >
+                  {aiLoading ? '✨ Thinking...' : '✨ AI Suggest (priority + subtasks)'}
+                </button>
+                {aiSubtasks.length > 0 && (
+                  <div style={{ background: '#f5f3ff', border: '1px solid #ddd6fe', borderRadius: 10, padding: 12, marginTop: 8, fontSize: 13 }}>
+                    <strong style={{ color: '#8b5cf6' }}>Suggested subtasks:</strong>
+                    <ul style={{ margin: '6px 0 0 18px', color: '#555' }}>
+                      {aiSubtasks.map((s, i) => <li key={i}>{s}</li>)}
+                    </ul>
+                  </div>
+                )}
               </div>
               <div className="field">
                 <label>Priority</label>

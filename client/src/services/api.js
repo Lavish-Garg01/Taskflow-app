@@ -27,4 +27,6 @@ export const updateTask    = (id, data) => API.put(`/tasks/${id}`, data);
 export const deleteTask    = (id)   => API.delete(`/tasks/${id}`);
 export const getMyTasks    = ()     => API.get('/tasks/my');
 
+export const getAISuggestion = (data) => API.post('/ai/suggest', data);
+
 export default API;

@@ -17,6 +17,7 @@ app.use(express.json());
 app.use('/api/auth',     require('./routes/auth'));
 app.use('/api/projects', require('./routes/projects'));
 app.use('/api/tasks',    require('./routes/tasks'));
+app.use('/api/ai',       require('./routes/ai'));
 
 // Health check
 app.get('/', (req, res) => {
